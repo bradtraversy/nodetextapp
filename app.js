@@ -46,7 +46,8 @@ app.post('/', (req, res) => {
         // Get data from response
         const data = {
           id: responseData.messages[0]['message-id'],
-          number: responseData.messages[0]['to']
+          number: responseData.messages[0]['to'],
+          error: responseData.messages[0]['error-text']
         }
 
         // Emit to the client
