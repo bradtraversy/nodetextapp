@@ -8,7 +8,7 @@ const socketio = require('socket.io');
 const nexmo = new Nexmo({
   apiKey: 'YOURAPIKEY',
   apiSecret: 'YOURAPISECRET'
-}, {debug: true});
+}, { debug: true });
 
 // Init app
 const app = express();
@@ -33,8 +33,7 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
   // res.send(req.body);
   // console.log(req.body);
-  const number = req.body.number;
-  const text = req.body.text;
+  const { number, text } = req.body;
 
   nexmo.message.sendSms(
     'YOURVURTUALNUMBER', number, text, { type: 'unicode' },
@@ -42,13 +41,15 @@ app.post('/', (req, res) => {
       if(err) {
         console.log(err);
       } else {
+        const { messages } = responseData;
+        const { ['message-id']: id, ['to']: number, ['error-text']: error  } = messages[0];
         console.dir(responseData);
         // Get data from response
         const data = {
-          id: responseData.messages[0]['message-id'],
-          number: responseData.messages[0]['to'],
-          error: responseData.messages[0]['error-text']
-        }
+          id,
+          number,
+          error
+        };
 
         // Emit to the client
         io.emit('smsStatus', data);
@@ -70,4 +71,4 @@ io.on('connection', (socket) => {
   io.on('disconnect', () => {
     console.log('Disconnected');
   })
-})
+});
